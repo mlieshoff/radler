@@ -14,11 +14,11 @@ import java.util.List;
 public class ObjectComboBoxModel implements ComboBoxModel {
 
     private List<Object> objects;
-    private UiClassResolver uiClassResolver;
+    private MetaModel uiClassResolver;
 
     private Object selected;
 
-    public ObjectComboBoxModel(List<Object> objects, UiClassResolver uiClassResolver) {
+    public ObjectComboBoxModel(List<Object> objects, MetaModel uiClassResolver) {
         this.objects = objects;
         this.uiClassResolver = uiClassResolver;
     }

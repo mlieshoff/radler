@@ -3,7 +3,7 @@ package radler;
 import radler.gui.CloseAction;
 import radler.gui.ObjectSearch;
 import radler.gui.OpenAction;
-import radler.gui.UiClassResolver;
+import radler.gui.MetaModel;
 import radler.persistence.GenericDataProvider;
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class Application extends JFrame implements ActionListener {
 
     private Map<String, Class<?>> _classes = new HashMap<String, Class<?>>();
-    private Map<Class<?>, UiClassResolver> _resolvers = new HashMap<Class<?>, UiClassResolver>();
+    private Map<Class<?>, MetaModel> _resolvers = new HashMap<Class<?>, MetaModel>();
     private JTabbedPane _tabbedPane = new JTabbedPane();
 
     private Map<String, JComponent> _openTabs = new HashMap<String, JComponent>();
@@ -31,7 +31,7 @@ public class Application extends JFrame implements ActionListener {
     public Application(Class<?>[] classes) {
         for (Class<?> clazz : classes) {
             _classes.put(clazz.getName(), clazz);
-            _resolvers.put(clazz, new UiClassResolver(clazz));
+            _resolvers.put(clazz, new MetaModel(clazz));
         }
         _dataProvider = new GenericDataProvider(_resolvers);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -60,7 +60,7 @@ public class Application extends JFrame implements ActionListener {
         if (e.getSource() instanceof JMenuItem) {
             JMenuItem menuItem = (JMenuItem) e.getSource();
             Class<?> clazz = _classes.get(menuItem.getName());
-            UiClassResolver uiClassResolver = _resolvers.get(clazz);
+            MetaModel uiClassResolver = _resolvers.get(clazz);
             _tabbedPane.add(uiClassResolver.getTitle(), new ObjectSearch(uiClassResolver, _dataProvider,
                     new OpenAction() {
                 @Override

@@ -5,26 +5,23 @@ import radler.gui.annotation.Editables;
 import radler.gui.annotation.Selectables;
 import radler.persistence.annotation.*;
 
-import java.awt.*;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * This ...
  *
  * @author mlieshoff
  */
-public class UiClassResolver {
+public class MetaModel {
     private String _title;
     private Class<?> _clazz;
-    private Field _keyField;
+    private List<MetaField> _keyFields = new ArrayList<MetaField>();
     private Map<String, MetaField> _fieldsByName = new HashMap<String, MetaField>();
     private Map<Integer, MetaField> _selectableFields = new TreeMap<Integer, MetaField>();
     private Map<Integer, MetaField> _editableFields = new TreeMap<Integer, MetaField>();
 
-    public UiClassResolver(Class<?> clazz) {
+    public MetaModel(Class<?> clazz) {
         _clazz = clazz;
         _title = _clazz.getSimpleName();
 
@@ -32,7 +29,7 @@ public class UiClassResolver {
             MetaField metaField = new MetaField(field);
             _fieldsByName.put(field.getName(), metaField);
             if (field.isAnnotationPresent(Id.class)) {
-                _keyField = field;
+                _keyFields.add(metaField);
                 metaField.setIdentifier(true);
                 System.out.println(clazz.getName() + "    key: " + metaField.getName());
             }
@@ -97,9 +94,16 @@ public class UiClassResolver {
         }
     }
 
-    public Object getKey(Object object) {
-        MetaField field = _fieldsByName.get(_keyField.getName());
-        return field.getValue(object);
+    public Map<MetaField, Object> getKeys(Object object) {
+        Map<MetaField, Object> map = new HashMap<MetaField, Object>();
+        for (MetaField metaField : _keyFields) {
+            map.put(metaField, metaField.getValue(object));
+        }
+        return map;
+    }
+
+    public List<MetaField> getKeyFields() {
+        return _keyFields;
     }
 
     public Class<?> getObjectClass() {
@@ -162,14 +166,23 @@ public class UiClassResolver {
 
     public void setEditableValue(int index, Object object, Object value) {
         MetaField field = _editableFields.get(index);
-        field.setEditableValue(object, value);
+        if (value != null) {
+            Class<?> valueClass = value.getClass();
+            Class<?> fieldClass = field.getWrappedType();
+            if (valueClass != fieldClass) {
+                // from text fields
+                if (valueClass == String.class) {
+                    if (fieldClass == Integer.class) {
+                        value = Integer.valueOf(value.toString());
+                    }
+                }
+            }
+        }
+        field.setValue(object, value);
     }
 
     public MetaField getEditableMetaField(int index) {
         return _editableFields.get(index);
     }
 
-    public Component displayObject(Object value) {
-        return null;  //To change body of created methods use File | Settings | File Templates.
-    }
 }

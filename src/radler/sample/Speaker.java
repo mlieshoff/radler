@@ -18,8 +18,9 @@ import java.util.List;
 public class Speaker {
 
     @Id
+    private int id;
+
     private String firstname;
-    @Id
     private String lastname;
     private String street;
     private String streetNumber;

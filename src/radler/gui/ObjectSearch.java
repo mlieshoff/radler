@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class ObjectSearch extends JPanel implements ActionListener {
 
-    private UiClassResolver _uiClassResolver;
+    private MetaModel _uiClassResolver;
     private DataProvider<Object, Object> _dataProvider;
 
     private JTable _table;
@@ -29,7 +29,7 @@ public class ObjectSearch extends JPanel implements ActionListener {
     private OpenAction _openAction;
     private CloseAction _closeAction;
 
-    public ObjectSearch(UiClassResolver uiClassResolver, DataProvider<Object, Object> dataProvider, OpenAction openAction, CloseAction closeAction) {
+    public ObjectSearch(MetaModel uiClassResolver, DataProvider<Object, Object> dataProvider, OpenAction openAction, CloseAction closeAction) {
         _uiClassResolver = uiClassResolver;
         _dataProvider = dataProvider;
         _openAction = openAction;
