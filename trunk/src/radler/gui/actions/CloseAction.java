@@ -1,4 +1,4 @@
-package radler.gui;
+package radler.gui.actions;
 
 import javax.swing.*;
 

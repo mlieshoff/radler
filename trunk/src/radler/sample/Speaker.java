@@ -32,10 +32,10 @@ public class Speaker {
     @OneToMany
     private Sex sex;
 
-    @ManyToMany
+    @ManyToMany(to = Meeting.class)
     private List<Meeting> meeting;
 
-    @ManyToMany
+    @ManyToMany(to = Role.class)
     private List<Role> role;
 
     public String getFirstname() {

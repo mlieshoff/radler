@@ -13,4 +13,5 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ManyToOne {
+    Class<?> to();
 }

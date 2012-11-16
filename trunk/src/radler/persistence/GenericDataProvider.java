@@ -2,6 +2,7 @@ package radler.persistence;
 
 import radler.gui.MetaField;
 import radler.gui.MetaModel;
+import radler.sample.Role;
 import radler.sample.Sex;
 
 import java.util.ArrayList;
@@ -26,6 +27,10 @@ public class GenericDataProvider implements DataProvider<Object, Object> {
         write(createSex("M"));
         write(createSex("F"));
 
+        write(createRole("admin"));
+        write(createRole("user"));
+        write(createRole("guest"));
+
     }
 
     private Sex createSex(String title) {
@@ -33,6 +38,13 @@ public class GenericDataProvider implements DataProvider<Object, Object> {
         sex.setTitle(title);
         return sex;
     }
+
+    private Role createRole(String title) {
+        Role role = new Role();
+        role.setTitle(title);
+        return role;
+    }
+
 
     @Override
     public Object create(Class<?> clazz) {

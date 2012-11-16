@@ -3,6 +3,8 @@ package radler.gui;
 import radler.gui.annotation.Display;
 import radler.gui.annotation.Editables;
 import radler.gui.annotation.Selectables;
+import radler.persistence.Relation;
+import radler.persistence.RelationType;
 import radler.persistence.annotation.*;
 
 import java.lang.reflect.Field;
@@ -34,17 +36,26 @@ public class MetaModel {
                 System.out.println(clazz.getName() + "    key: " + metaField.getName());
             }
 
+            Relation relation = new Relation();
             if (field.isAnnotationPresent(OneToMany.class)) {
-                metaField.setOneToMany(true);
+                relation.setRelationType(RelationType.ONE_TO_MANY);
+                metaField.setRelation(relation);
             }
             if (field.isAnnotationPresent(OneToOne.class)) {
-                metaField.setOneToOne(true);
+                relation.setRelationType(RelationType.ONE_TO_ONE);
+                metaField.setRelation(relation);
             }
             if (field.isAnnotationPresent(ManyToOne.class)) {
-                metaField.setManyToOne(true);
+                ManyToOne annotation = (ManyToOne) field.getAnnotation(ManyToOne.class);
+                relation.setRelationType(RelationType.MANY_TO_ONE);
+                relation.setTo(annotation.to());
+                metaField.setRelation(relation);
             }
             if (field.isAnnotationPresent(ManyToMany.class)) {
-                metaField.setManyToMany(true);
+                ManyToMany annotation = (ManyToMany) field.getAnnotation(ManyToMany.class);
+                relation.setRelationType(RelationType.MANY_TO_MANY);
+                relation.setTo(annotation.to());
+                metaField.setRelation(relation);
             }
         }
 
@@ -52,7 +63,7 @@ public class MetaModel {
             Display annotation = clazz.getAnnotation(Display.class);
             for (int i = 0; i < annotation.columns().length; i ++) {
                 MetaField metaField = _fieldsByName.get(annotation.columns()[i]);
-                metaField.setDisplayFormat(annotation.format());
+                // TODO
             }
         }
 
@@ -148,14 +159,18 @@ public class MetaModel {
     public InputType getEditableType(int index) {
         MetaField field = _editableFields.get(index);
         Class<?> clazz = field.getWrappedType();
+        Relation relation = field.getRelation();
         if (clazz == String.class) {
             return InputType.TEXTFIELD;
         } else if (clazz == Boolean.class) {
             return InputType.CHECKBOX;
-        } else if (field.isOneToMany() || field.isOneToOne()) {
-            return InputType.COMBOBOX;
-        } else if (field.isManyToMany() || field.isManyToOne()) {
-            return InputType.TAB;
+        } else if (relation != null) {
+            RelationType relationType = relation.getRelationType();
+            if (relationType == RelationType.ONE_TO_MANY || relationType == RelationType.ONE_TO_ONE) {
+                return InputType.COMBOBOX;
+            } else if (relationType == RelationType.MANY_TO_MANY || relationType == RelationType.MANY_TO_ONE) {
+                return InputType.TAB;
+            }
         }
         return InputType.TEXTFIELD;
     }

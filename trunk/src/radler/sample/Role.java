@@ -18,7 +18,7 @@ public class Role {
     @Id
     private String title;
 
-    @ManyToMany
+    @ManyToMany(to = Speaker.class)
     private List<Speaker> speaker;
 
     public String getTitle() {
