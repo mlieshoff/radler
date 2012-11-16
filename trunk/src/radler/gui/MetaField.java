@@ -45,7 +45,7 @@ public class MetaField {
         }
     }
 
-    public void setEditableValue(Object object, Object value) {
+    public void setValue(Object object, Object value) {
         try {
             if (!field.isAccessible()) {
                 field.setAccessible(true);
@@ -61,8 +61,20 @@ public class MetaField {
 
     public Class<?> getWrappedType() {
         Class<?> clazz = field.getType();
-        if (clazz == boolean.class) {
+        if (clazz == short.class) {
+            return Short.class;
+        } else if (clazz == int.class) {
+            return Integer.class;
+        } else if (clazz == float.class) {
+            return Float.class;
+        } else if (clazz == long.class) {
+            return Long.class;
+        } else if (clazz == double.class) {
+            return Double.class;
+        } else if (clazz == boolean.class) {
             return Boolean.class;
+        } else if (clazz == char.class) {
+            return String.class;
         }
         return clazz;
     }

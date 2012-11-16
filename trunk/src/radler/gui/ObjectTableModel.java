@@ -7,9 +7,9 @@ import java.util.List;
 public class ObjectTableModel extends AbstractTableModel implements TableModel {
 
     private List<?> _objects;
-    private UiClassResolver _uiClassResolver;
+    private MetaModel _uiClassResolver;
 
-    public ObjectTableModel(List<?> objects, UiClassResolver uiClassResolver) {
+    public ObjectTableModel(List<?> objects, MetaModel uiClassResolver) {
         _uiClassResolver = uiClassResolver;
         _objects = objects;
     }
@@ -30,7 +30,6 @@ public class ObjectTableModel extends AbstractTableModel implements TableModel {
     }
 
     public Class getColumnClass(int columnIndex) {
-        System.out.println("--> " + columnIndex + "    " + _uiClassResolver.getSelectableValueType(columnIndex));
         return _uiClassResolver.getSelectableValueType(columnIndex);
     }
 
