@@ -2,7 +2,6 @@ package radler.gui;
 
 import radler.gui.actions.CancelAction;
 import radler.gui.actions.SelectAction;
-import radler.persistence.DataProvider;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 public class ObjectSimpleSearch extends JPanel implements ActionListener {
 
     private MetaModel _metaModel;
-    private DataProvider<Object, Object> _dataProvider;
 
     private JTable _table;
     private java.util.List<Object> _objects = new ArrayList<Object>();

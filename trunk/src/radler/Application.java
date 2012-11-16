@@ -2,15 +2,16 @@ package radler;
 
 import radler.gui.MetaModel;
 import radler.gui.ObjectSearch;
-import radler.gui.actions.CancelAction;
-import radler.gui.actions.OpenAction;
+import radler.gui.UiUtils;
+import radler.gui.actions.*;
+import radler.persistence.DataProvider;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 /**
  * This ...
@@ -29,6 +30,7 @@ public class Application extends JFrame implements ActionListener {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(new Dimension(640, 480));
         init();
+        UiUtils.center(this);
         setVisible(true);
     }
 
@@ -51,27 +53,57 @@ public class Application extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JMenuItem) {
             JMenuItem menuItem = (JMenuItem) e.getSource();
-            Class<?> clazz = _applicationFactory.getClasses().get(menuItem.getName());
-            MetaModel metaModel = _applicationFactory.getResolvers().get(clazz);
-            _tabbedPane.add(metaModel.getTitle(), new ObjectSearch(metaModel, _applicationFactory.getDataProvider(),
-                    new OpenAction() {
-                @Override
-                public void open(JComponent component) {
-                    if (!_openTabs.containsKey(component.getName())) {
-                        _tabbedPane.add(component);
-                        _openTabs.put(component.getName(), component);
-                    } else {
-                        component = _openTabs.get(component.getName());
-                    }
-                    _tabbedPane.setSelectedComponent(component);
-                }
-            }, new CancelAction() {
-                @Override
-                public void onCancel(JComponent component) {
-                    _openTabs.remove(component.getName());
-                    _tabbedPane.remove(component);
-                }
-            }));
+            final Class<?> clazz = _applicationFactory.getClasses().get(menuItem.getName());
+            final MetaModel metaModel = _applicationFactory.getResolvers().get(clazz);
+            final DataProvider dataProvider = _applicationFactory.getDataProvider();
+            String componentName = metaModel.getTitle();
+            JComponent component = _openTabs.get(componentName);
+            if (component == null) {
+                component = new ObjectSearch(metaModel,
+                        dataProvider.read(clazz),
+                        new OpenAction() {
+                            @Override
+                            public void open(JComponent component) {
+                                if (!_openTabs.containsKey(component.getName())) {
+                                    _tabbedPane.add(component);
+                                    _openTabs.put(component.getName(), component);
+                                } else {
+                                    component = _openTabs.get(component.getName());
+                                }
+                                _tabbedPane.setSelectedComponent(component);
+                            }
+                        }, new CancelAction() {
+                            @Override
+                            public void onCancel(JComponent component) {
+                                _openTabs.remove(component.getName());
+                                _tabbedPane.remove(component);
+                            }
+                        }, new NewAction() {
+                            @Override
+                            public Object doNew() {
+                                return dataProvider.create(clazz);
+                            }
+                        }, new ReadAction() {
+                            @Override
+                            public List<Object> read(Class<?> clazz) {
+                                return dataProvider.read(clazz);
+                            }
+                        }, new SaveAction() {
+                            @Override
+                            public void save(Object object) {
+                                dataProvider.write(object);
+                            }
+                        }, new ResetAction() {
+                            @Override
+                            public Object reset(Object object) {
+                                return dataProvider.get(clazz, dataProvider.getKey(metaModel, object));
+                            }
+                        }
+                );
+                _tabbedPane.add(componentName, component);
+                _openTabs.put(componentName, component);
+            }
+            _tabbedPane.setSelectedComponent(component);
             _tabbedPane.setVisible(true);
             _tabbedPane.doLayout();
         }

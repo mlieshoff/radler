@@ -2,9 +2,7 @@ package radler.gui;
 
 import net.miginfocom.swing.MigLayout;
 import radler.ApplicationFactory;
-import radler.gui.actions.CloseAction;
-import radler.gui.actions.SaveAction;
-import radler.persistence.DataProvider;
+import radler.gui.actions.*;
 import radler.persistence.Relation;
 import radler.persistence.RelationType;
 
@@ -24,8 +22,6 @@ public class ObjectEditor extends JPanel implements ActionListener {
     private MetaModel _metaModel;
     private Object _object;
 
-    private DataProvider<Object, Object> _dataProvider;
-
     private JButton _buttonNew;
     private JButton _buttonReset;
     private JButton _buttonSave;
@@ -33,16 +29,22 @@ public class ObjectEditor extends JPanel implements ActionListener {
 
     private CloseAction _closeAction;
     private SaveAction _saveAction;
+    private ReadAction _readAction;
+    private ResetAction _resetAction;
+    private NewAction _newAction;
 
     private java.util.List<JComponent> _inputs = new ArrayList<JComponent>();
 
-    public ObjectEditor(MetaModel uiClassResolver, DataProvider<Object, Object> dataProvider, Object object, CloseAction closeAction, SaveAction saveAction) {
-        _metaModel = uiClassResolver;
+    public ObjectEditor(String name, MetaModel metaModel, Object object, CloseAction closeAction,
+            SaveAction saveAction, ReadAction readAction, ResetAction resetAction, NewAction newAction) {
+        _metaModel = metaModel;
         _object = object;
-        _dataProvider = dataProvider;
         _closeAction = closeAction;
         _saveAction = saveAction;
-        setName(String.format("%s.%s", _metaModel.getTitle(), _dataProvider.getKey(_metaModel, object)));
+        _readAction = readAction;
+        _resetAction = resetAction;
+        _newAction = newAction;
+        setName(String.format("%s.%s", _metaModel.getTitle(), name));
         setSize(new Dimension(320, 200));
         init();
         setVisible(true);
@@ -60,8 +62,10 @@ public class ObjectEditor extends JPanel implements ActionListener {
         JPanel control = new JPanel();
         _buttonNew = new JButton("Neu");
         _buttonNew.addActionListener(this);
+        _buttonNew.setVisible(false);
         _buttonReset = new JButton("Verwerfen");
         _buttonReset.addActionListener(this);
+        _buttonReset.setVisible(false);
         _buttonSave = new JButton("Speichern");
         _buttonSave.addActionListener(this);
         _buttonCancel = new JButton("Abbruch");
@@ -90,7 +94,7 @@ public class ObjectEditor extends JPanel implements ActionListener {
                 checkBox.setSelected(((Boolean) _metaModel.getEditableFieldValue(metaField, _object)).booleanValue());
                 component = checkBox;
             } else if (_metaModel.getEditableType(i) == InputType.COMBOBOX) {
-                JComboBox comboBox = new JComboBox(new ObjectComboBoxModel(_dataProvider.read(metaField.getWrappedType()), _metaModel));
+                JComboBox comboBox = new JComboBox(new ObjectComboBoxModel(_readAction.read(metaField.getWrappedType()), _metaModel));
                 component = comboBox;
             } else {
                 component = null;
@@ -121,7 +125,7 @@ public class ObjectEditor extends JPanel implements ActionListener {
         if (e.getSource() == _buttonCancel) {
             _closeAction.close(this);
         } else if (e.getSource() == _buttonReset) {
-            _object = _dataProvider.get(_metaModel.getObjectClass(), _dataProvider.getKey(_metaModel, _object));
+            _object = _resetAction.reset(_object);
         } else if (e.getSource() == _buttonSave) {
             for (int i = 0, n = _inputs.size(); i < n; i ++) {
                 JComponent component = _inputs.get(i);
@@ -137,11 +141,21 @@ public class ObjectEditor extends JPanel implements ActionListener {
                     _metaModel.setEditableValue(i, _object, value);
                 }
             }
-            _dataProvider.write(_object);
-            _saveAction.save(this);
+            _saveAction.save(_object);
             _closeAction.close(this);
         } else if (e.getSource() == _buttonNew) {
-            _dataProvider.create(_metaModel.getObjectClass());
+            for (JComponent component : _inputs) {
+                if (component instanceof JTextField) {
+                    ((JTextField) component).setText("");
+                } else if (component instanceof JCheckBox) {
+                    ((JCheckBox) component).setSelected(false);
+                } else if (component instanceof JComboBox) {
+                    ((JComboBox) component).setSelectedIndex(-1);
+                }
+            }
+            _newAction.doNew();
         }
     }
+
+
 }
