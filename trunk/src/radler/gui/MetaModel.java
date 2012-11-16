@@ -96,6 +96,10 @@ public class MetaModel {
         return _fieldsByName.get(key);
     }
 
+    public Collection<MetaField> getMetaFields() {
+        return _fieldsByName.values();
+    }
+
     public String getTitle() {
         return _title;
     }
