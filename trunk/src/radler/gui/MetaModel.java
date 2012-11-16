@@ -38,7 +38,10 @@ public class MetaModel {
 
             Relation relation = new Relation();
             if (field.isAnnotationPresent(OneToMany.class)) {
+                OneToMany annotation = (OneToMany) field.getAnnotation(OneToMany.class);
                 relation.setRelationType(RelationType.ONE_TO_MANY);
+                relation.setDisplayPattern(annotation.displayPattern());
+                relation.setDisplayMembers(annotation.displayFields());
                 metaField.setRelation(relation);
             }
             if (field.isAnnotationPresent(OneToOne.class)) {
@@ -87,6 +90,10 @@ public class MetaModel {
             }
         }
 
+    }
+
+    public MetaField getMetaField(String key) {
+        return _fieldsByName.get(key);
     }
 
     public String getTitle() {

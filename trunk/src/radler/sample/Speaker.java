@@ -29,7 +29,7 @@ public class Speaker {
 
     private boolean active;
 
-    @OneToMany
+    @OneToMany(displayPattern = "%s", displayFields={"title"})
     private Sex sex;
 
     @ManyToMany(to = Meeting.class)

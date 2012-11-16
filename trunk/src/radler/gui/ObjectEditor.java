@@ -19,6 +19,8 @@ import java.util.ArrayList;
  */
 public class ObjectEditor extends JPanel implements ActionListener {
 
+    private ApplicationFactory _applicationFactory = ApplicationFactory.getInstance();
+
     private MetaModel _metaModel;
     private Object _object;
 
@@ -94,7 +96,13 @@ public class ObjectEditor extends JPanel implements ActionListener {
                 checkBox.setSelected(((Boolean) _metaModel.getEditableFieldValue(metaField, _object)).booleanValue());
                 component = checkBox;
             } else if (_metaModel.getEditableType(i) == InputType.COMBOBOX) {
-                JComboBox comboBox = new JComboBox(new ObjectComboBoxModel(_readAction.read(metaField.getWrappedType()), _metaModel));
+                Class<?> foreignClass = metaField.getWrappedType();
+                JComboBox comboBox = new JComboBox(new ObjectComboBoxModel(_readAction.read(foreignClass), _metaModel));
+//                comboBox.setRenderer(new ComboBoxRenderer(_applicationFactory.getResolvers().get(foreignClass), metaField));
+                Object selected = metaField.getValue(_object);
+                if (selected != null) {
+                    comboBox.setSelectedItem(selected);
+                }
                 component = comboBox;
             } else {
                 component = null;
@@ -136,6 +144,9 @@ public class ObjectEditor extends JPanel implements ActionListener {
                 } else if (_metaModel.getEditableType(i) == InputType.CHECKBOX) {
                     JCheckBox checkBox = (JCheckBox) component;
                     value = checkBox.isSelected();
+                } else if (_metaModel.getEditableType(i) == InputType.COMBOBOX) {
+                    JComboBox comboBox = (JComboBox) component;
+                    value = comboBox.getSelectedItem();
                 }
                 if (value != null) {
                     _metaModel.setEditableValue(i, _object, value);

@@ -1,16 +1,19 @@
 package radler.gui;
 
+import radler.ApplicationFactory;
+
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import java.util.List;
 
 public class ObjectTableModel extends AbstractTableModel implements TableModel {
 
+    private ApplicationFactory _applicationFactory = ApplicationFactory.getInstance();
     private List<?> _objects;
-    private MetaModel _uiClassResolver;
+    private MetaModel _metaModel;
 
-    public ObjectTableModel(List<?> objects, MetaModel uiClassResolver) {
-        _uiClassResolver = uiClassResolver;
+    public ObjectTableModel(List<?> objects, MetaModel metaModel) {
+        _metaModel = metaModel;
         _objects = objects;
     }
 
@@ -21,21 +24,21 @@ public class ObjectTableModel extends AbstractTableModel implements TableModel {
 
     @Override
     public String getColumnName(int column) {
-        return _uiClassResolver.getSelectableFieldTitle(column);
+        return _applicationFactory.getResource(_metaModel.getSelectableFieldTitle(column));
     }
 
     @Override
     public int getColumnCount() {
-        return _uiClassResolver.getNumberOfSelectableFields();
+        return _metaModel.getNumberOfSelectableFields();
     }
 
     public Class getColumnClass(int columnIndex) {
-        return _uiClassResolver.getSelectableValueType(columnIndex);
+        return _metaModel.getSelectableValueType(columnIndex);
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return _uiClassResolver.getSelectableValue(_objects.get(rowIndex), columnIndex);
+        return _metaModel.getSelectableValue(_objects.get(rowIndex), columnIndex);
     }
 
 
