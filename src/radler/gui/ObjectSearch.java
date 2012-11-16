@@ -1,5 +1,9 @@
 package radler.gui;
 
+import radler.gui.actions.CancelAction;
+import radler.gui.actions.CloseAction;
+import radler.gui.actions.OpenAction;
+import radler.gui.actions.SaveAction;
 import radler.persistence.DataProvider;
 
 import javax.swing.*;
@@ -15,7 +19,7 @@ import java.util.ArrayList;
  */
 public class ObjectSearch extends JPanel implements ActionListener {
 
-    private MetaModel _uiClassResolver;
+    private MetaModel _metaModel;
     private DataProvider<Object, Object> _dataProvider;
 
     private JTable _table;
@@ -27,20 +31,21 @@ public class ObjectSearch extends JPanel implements ActionListener {
     private JButton _buttonCancel;
 
     private OpenAction _openAction;
-    private CloseAction _closeAction;
+    private CancelAction _cancelAction;
 
-    public ObjectSearch(MetaModel uiClassResolver, DataProvider<Object, Object> dataProvider, OpenAction openAction, CloseAction closeAction) {
-        _uiClassResolver = uiClassResolver;
+    public ObjectSearch(MetaModel metaModel, DataProvider<Object, Object> dataProvider, OpenAction openAction,
+                        CancelAction cancelAction) {
+        _metaModel = metaModel;
         _dataProvider = dataProvider;
         _openAction = openAction;
-        _closeAction = closeAction;
-        setSize(new Dimension(320, 200));
+        _cancelAction = cancelAction;
+        setSize(new Dimension(640, 480));
         init();
         setVisible(true);
     }
 
     private void init() {
-        _objects = _dataProvider.read(_uiClassResolver.getObjectClass());
+        _objects = _dataProvider.read(_metaModel.getObjectClass());
         if (_objects == null) {
             _objects = new ArrayList<Object>();
         }
@@ -69,7 +74,7 @@ public class ObjectSearch extends JPanel implements ActionListener {
     private Component createContent() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        _model = new ObjectTableModel(_objects, _uiClassResolver);
+        _model = new ObjectTableModel(_objects, _metaModel);
         _table = new JTable(_model);
         JScrollPane scrollPane = new JScrollPane(_table);
         scrollPane.setWheelScrollingEnabled(true);
@@ -82,10 +87,10 @@ public class ObjectSearch extends JPanel implements ActionListener {
         System.out.println(e.getSource());
         if (e.getSource() == _buttonSelect && _table.getSelectedRow() >= 0) {
             Object object = _objects.get(_table.getSelectedRow());
-            _openAction.open(new ObjectEditor(_uiClassResolver, _dataProvider, object, new CloseAction() {
+            _openAction.open(new ObjectEditor(_metaModel, _dataProvider, object, new CloseAction() {
                 @Override
                 public void close(JComponent component) {
-                    _closeAction.close(component);
+                    _cancelAction.onCancel(component);
                 }
             }, new SaveAction() {
                 @Override
@@ -94,24 +99,24 @@ public class ObjectSearch extends JPanel implements ActionListener {
                 }
             }));
         } else if (e.getSource() == _buttonNew) {
-            _openAction.open(new ObjectEditor(_uiClassResolver, _dataProvider, _dataProvider.create(_uiClassResolver.getObjectClass()), new CloseAction() {
+            _openAction.open(new ObjectEditor(_metaModel, _dataProvider, _dataProvider.create(_metaModel.getObjectClass()), new CloseAction() {
                 @Override
                 public void close(JComponent component) {
-                    _closeAction.close(component);
+                    _cancelAction.onCancel(component);
                     _objects.clear();
-                    _objects.addAll(_dataProvider.read(_uiClassResolver.getObjectClass()));
+                    _objects.addAll(_dataProvider.read(_metaModel.getObjectClass()));
                     _model.fireTableDataChanged();
                 }
             }, new SaveAction() {
                 @Override
                 public void save(JComponent component) {
                     _objects.clear();
-                    _objects.addAll(_dataProvider.read(_uiClassResolver.getObjectClass()));
+                    _objects.addAll(_dataProvider.read(_metaModel.getObjectClass()));
                     _model.fireTableDataChanged();
                 }
             }));
         } else if (e.getSource() == _buttonCancel) {
-            _closeAction.close(this);
+            _cancelAction.onCancel(this);
         }
     }
 

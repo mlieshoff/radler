@@ -1,4 +1,4 @@
-package radler.gui;
+package radler.gui.actions;
 
 import javax.swing.*;
 
@@ -7,7 +7,7 @@ import javax.swing.*;
  *
  * @author mlieshoff
  */
-public interface SaveAction {
+public interface AddAction {
 
     void save(JComponent component);
 }

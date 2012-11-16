@@ -1,7 +1,8 @@
 package radler.gui;
 
+import radler.persistence.Relation;
+
 import java.lang.reflect.Field;
-import java.util.List;
 
 /**
  * This ...
@@ -14,15 +15,8 @@ public class MetaField {
     private boolean editable;
     private boolean selectable;
     private boolean identifier;
-    private boolean oneToOne;
-    private boolean oneToMany;
-    private boolean manyToOne;
-    private boolean manyToMany;
     private String name;
-
-
-    private String displayFormat;
-    private List<Field> displayFields;
+    private Relation relation;
 
     public MetaField(Field field) {
         this.field = field;
@@ -111,30 +105,6 @@ public class MetaField {
         this.identifier = identifier;
     }
 
-    public boolean isOneToMany() {
-        return oneToMany;
-    }
-
-    public void setOneToMany(boolean oneToMany) {
-        this.oneToMany = oneToMany;
-    }
-
-    public boolean isManyToOne() {
-        return manyToOne;
-    }
-
-    public void setManyToOne(boolean manyToOne) {
-        this.manyToOne = manyToOne;
-    }
-
-    public boolean isManyToMany() {
-        return manyToMany;
-    }
-
-    public void setManyToMany(boolean manyToMany) {
-        this.manyToMany = manyToMany;
-    }
-
     public String getName() {
         return name;
     }
@@ -143,27 +113,11 @@ public class MetaField {
         this.name = name;
     }
 
-    public String getDisplayFormat() {
-        return displayFormat;
+    public Relation getRelation() {
+        return relation;
     }
 
-    public void setDisplayFormat(String displayFormat) {
-        this.displayFormat = displayFormat;
-    }
-
-    public List<Field> getDisplayFields() {
-        return displayFields;
-    }
-
-    public void setDisplayFields(List<Field> displayFields) {
-        this.displayFields = displayFields;
-    }
-
-    public boolean isOneToOne() {
-        return oneToOne;
-    }
-
-    public void setOneToOne(boolean oneToOne) {
-        this.oneToOne = oneToOne;
+    public void setRelation(Relation relation) {
+        this.relation = relation;
     }
 }

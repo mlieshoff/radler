@@ -1,7 +1,12 @@
 package radler.gui;
 
 import net.miginfocom.swing.MigLayout;
+import radler.ApplicationFactory;
+import radler.gui.actions.CloseAction;
+import radler.gui.actions.SaveAction;
 import radler.persistence.DataProvider;
+import radler.persistence.Relation;
+import radler.persistence.RelationType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -99,26 +104,16 @@ public class ObjectEditor extends JPanel implements ActionListener {
         JTabbedPane tabbedPane = new JTabbedPane();
         for (int i = 0, n = _metaModel.getNumberOfEditableFields(); i < n; i ++) {
             MetaField metaField = _metaModel.getEditableMetaField(i);
-            if (_metaModel.getEditableType(i) == InputType.TAB) {
-                tabbedPane.add(metaField.getName(), new JLabel(_metaModel.getTitle()));
+            Relation relation = metaField.getRelation();
+            if (relation != null && relation.getRelationType() == RelationType.MANY_TO_MANY) {
+                MetaModel nmMetaModel = ApplicationFactory.getInstance().getResolvers().get(metaField.getRelation().getTo());
+                tabbedPane.add(metaField.getName(), new ObjectNmEditor(nmMetaModel, _metaModel, metaField, _object));
             }
         }
         if (tabbedPane.getTabCount() > 0) {
             master.add("Center", tabbedPane);
         }
         return master;
-    }
-
-    private JTabbedPane createTabs() {
-        JTabbedPane tabbedPane = new JTabbedPane();
-        for (int i = 0, n = _metaModel.getNumberOfEditableFields(); i < n; i ++) {
-            MetaField metaField = _metaModel.getEditableMetaField(i);
-            if (_metaModel.getEditableType(i) == InputType.TAB) {
-                tabbedPane.add(metaField.getName(), new JLabel(_metaModel.getTitle()));
-            }
-
-        }
-        return tabbedPane;
     }
 
     @Override

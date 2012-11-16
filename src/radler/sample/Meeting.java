@@ -20,7 +20,7 @@ public class Meeting {
     @Id
     private int month;
 
-    @ManyToMany
+    @ManyToMany(to = Speaker.class)
     private List<Speaker> speaker;
 
     public int getYear() {
