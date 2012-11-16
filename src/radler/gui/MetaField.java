@@ -120,4 +120,18 @@ public class MetaField {
     public void setRelation(Relation relation) {
         this.relation = relation;
     }
+
+    public String displayRelationString(MetaModel foreignModel, Object value) {
+        if (relation != null) {
+            String[] members = relation.getDisplayMembers();
+            Object[] values = new String[members.length];
+            for (int i = 0; i < members.length; i ++) {
+                String member = members[i];
+                MetaField field = foreignModel.getMetaField(member);
+                values[i] = field.getValue(value);
+            }
+            return String.format(relation.getDisplayPattern(), values);
+        }
+        return null;
+    }
 }
