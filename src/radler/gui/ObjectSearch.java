@@ -1,16 +1,13 @@
 package radler.gui;
 
-import radler.gui.actions.CancelAction;
-import radler.gui.actions.CloseAction;
-import radler.gui.actions.OpenAction;
-import radler.gui.actions.SaveAction;
-import radler.persistence.DataProvider;
+import radler.gui.actions.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This ...
@@ -20,10 +17,9 @@ import java.util.ArrayList;
 public class ObjectSearch extends JPanel implements ActionListener {
 
     private MetaModel _metaModel;
-    private DataProvider<Object, Object> _dataProvider;
 
     private JTable _table;
-    private java.util.List<Object> _objects;
+    private java.util.List<Object> _objects = new ArrayList<Object>();
     private ObjectTableModel _model;
 
     private JButton _buttonNew;
@@ -32,23 +28,30 @@ public class ObjectSearch extends JPanel implements ActionListener {
 
     private OpenAction _openAction;
     private CancelAction _cancelAction;
+    private ReadAction _readAction;
+    private SaveAction _saveAction;
+    private NewAction _newAction;
+    private ResetAction _resetAction;
 
-    public ObjectSearch(MetaModel metaModel, DataProvider<Object, Object> dataProvider, OpenAction openAction,
-                        CancelAction cancelAction) {
+    public ObjectSearch(MetaModel metaModel, java.util.List<Object> objects, OpenAction openAction,
+            CancelAction cancelAction, NewAction newAction, ReadAction readAction, SaveAction saveAction,
+            ResetAction resetAction) {
         _metaModel = metaModel;
-        _dataProvider = dataProvider;
         _openAction = openAction;
         _cancelAction = cancelAction;
+        _newAction = newAction;
+        _readAction = readAction;
+        _saveAction = saveAction;
+        _resetAction = resetAction;
+        if (objects != null && objects.size() > 0) {
+            _objects.addAll(objects);
+        }
         setSize(new Dimension(640, 480));
         init();
         setVisible(true);
     }
 
     private void init() {
-        _objects = _dataProvider.read(_metaModel.getObjectClass());
-        if (_objects == null) {
-            _objects = new ArrayList<Object>();
-        }
         setLayout(new BorderLayout());
         add("Center", createContent());
         add("South", createControls());
@@ -84,37 +87,72 @@ public class ObjectSearch extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println(e.getSource());
         if (e.getSource() == _buttonSelect && _table.getSelectedRow() >= 0) {
-            Object object = _objects.get(_table.getSelectedRow());
-            _openAction.open(new ObjectEditor(_metaModel, _dataProvider, object, new CloseAction() {
-                @Override
-                public void close(JComponent component) {
-                    _cancelAction.onCancel(component);
-                }
-            }, new SaveAction() {
-                @Override
-                public void save(JComponent component) {
-                    //To change body of implemented methods use File | Settings | File Templates.
-                }
-            }));
+            final Object object = _objects.get(_table.getSelectedRow());
+            _openAction.open(new ObjectEditor("..", _metaModel, object,
+                    new CloseAction() {
+                        @Override
+                        public void close(JComponent component) {
+                            _cancelAction.onCancel(component);
+                        }
+                    }, new SaveAction() {
+                        @Override
+                        public void save(Object object) {
+                            _saveAction.save(object);
+                        }
+                    }, new ReadAction() {
+                        @Override
+                        public java.util.List<Object> read(Class<?> clazz) {
+                            return _readAction.read(clazz);
+                        }
+                    }, new ResetAction() {
+                        @Override
+                        public Object reset(Object objectToReset) {
+                            return _resetAction.reset(objectToReset);
+                        }
+                    }, new NewAction() {
+                        @Override
+                        public Object doNew() {
+                            return _newAction.doNew();
+                        }
+                    }
+            ));
         } else if (e.getSource() == _buttonNew) {
-            _openAction.open(new ObjectEditor(_metaModel, _dataProvider, _dataProvider.create(_metaModel.getObjectClass()), new CloseAction() {
-                @Override
-                public void close(JComponent component) {
-                    _cancelAction.onCancel(component);
-                    _objects.clear();
-                    _objects.addAll(_dataProvider.read(_metaModel.getObjectClass()));
-                    _model.fireTableDataChanged();
-                }
-            }, new SaveAction() {
-                @Override
-                public void save(JComponent component) {
-                    _objects.clear();
-                    _objects.addAll(_dataProvider.read(_metaModel.getObjectClass()));
-                    _model.fireTableDataChanged();
-                }
-            }));
+            final Object object = _newAction.doNew();
+            _openAction.open(new ObjectEditor("*", _metaModel, object,
+                    new CloseAction() {
+                        @Override
+                        public void close(JComponent component) {
+                            _cancelAction.onCancel(component);
+                            _objects.clear();
+                            _objects.addAll(_readAction.read(_metaModel.getObjectClass()));
+                            _model.fireTableDataChanged();
+                        }
+                    }, new SaveAction() {
+                        @Override
+                        public void save(Object object) {
+                            _saveAction.save(object);
+                            _objects.clear();
+                            _objects.addAll(_readAction.read(_metaModel.getObjectClass()));
+                            _model.fireTableDataChanged();
+                        }
+                    }, new ReadAction() {
+                        @Override
+                        public List<Object> read(Class<?> clazz) {
+                            return _readAction.read(clazz);
+                        }
+                    }, new ResetAction() {
+                        @Override
+                        public Object reset(Object objectToReset) {
+                            return _resetAction.reset(objectToReset);
+                        }
+                    }, new NewAction() {
+                        @Override
+                        public Object doNew() {
+                            return _newAction.doNew();
+                        }
+                    }
+            ));
         } else if (e.getSource() == _buttonCancel) {
             _cancelAction.onCancel(this);
         }

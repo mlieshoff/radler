@@ -5,7 +5,7 @@ package radler.gui.actions;
  *
  * @author mlieshoff
  */
-public interface SaveAction {
+public interface ResetAction {
 
-    void save(Object object);
+    Object reset(Object objectToReset);
 }

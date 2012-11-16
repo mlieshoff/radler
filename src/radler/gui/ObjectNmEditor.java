@@ -101,6 +101,7 @@ public class ObjectNmEditor extends JPanel implements ActionListener {
                     ));
             }};
             dialog.setSize(640, 480);
+            UiUtils.center(dialog);
             dialog.setVisible(true);
         } else if (e.getSource() == _buttonRemove) {
             if (_table.getSelectedRow() >= 0) {
