@@ -17,4 +17,5 @@ public interface DataProvider<K, T> {
     List<T> read(Class<?> clazz);
 
     K getKey(MetaModel metaModel, Object object);
+
 }

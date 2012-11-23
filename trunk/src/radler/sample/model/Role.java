@@ -1,4 +1,4 @@
-package radler.sample;
+package radler.sample.model;
 
 import radler.gui.annotation.Editables;
 import radler.gui.annotation.Selectables;

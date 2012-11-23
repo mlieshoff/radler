@@ -1,9 +1,10 @@
-package radler.sample;
+package radler.sample.model;
 
 import radler.gui.annotation.Editables;
 import radler.gui.annotation.Selectables;
 import radler.persistence.annotation.Id;
 import radler.persistence.annotation.ManyToMany;
+import radler.sample.model.Speaker;
 
 import java.util.List;
 

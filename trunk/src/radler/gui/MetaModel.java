@@ -29,7 +29,7 @@ public class MetaModel {
 
         for (Field field : _clazz.getDeclaredFields()) {
             MetaField metaField = new MetaField(field);
-            _fieldsByName.put(field.getName(), metaField);
+            _fieldsByName.put(field.getName().toLowerCase(), metaField);
             if (field.isAnnotationPresent(Id.class)) {
                 _keyFields.add(metaField);
                 metaField.setIdentifier(true);
@@ -65,7 +65,7 @@ public class MetaModel {
         if (clazz.isAnnotationPresent(Display.class)) {
             Display annotation = clazz.getAnnotation(Display.class);
             for (int i = 0; i < annotation.columns().length; i ++) {
-                MetaField metaField = _fieldsByName.get(annotation.columns()[i]);
+                MetaField metaField = getMetaField(annotation.columns()[i]);
                 // TODO
             }
         }
@@ -73,7 +73,7 @@ public class MetaModel {
         if (clazz.isAnnotationPresent(Selectables.class)) {
             Selectables annotation = clazz.getAnnotation(Selectables.class);
             for (int i = 0; i < annotation.columns().length; i ++) {
-                MetaField metaField = _fieldsByName.get(annotation.columns()[i]);
+                MetaField metaField = getMetaField(annotation.columns()[i]);
                 metaField.setSelectable(true);
                 _selectableFields.put(i, metaField);
                 System.out.println(clazz.getName() + "    select: " + metaField.getName());
@@ -83,7 +83,7 @@ public class MetaModel {
         if (clazz.isAnnotationPresent(Editables.class)) {
             Editables annotation = clazz.getAnnotation(Editables.class);
             for (int i = 0; i < annotation.columns().length; i ++) {
-                MetaField metaField = _fieldsByName.get(annotation.columns()[i]);
+                MetaField metaField = getMetaField(annotation.columns()[i]);
                 metaField.setEditable(true);
                 _editableFields.put(i, metaField);
                 System.out.println(clazz.getName() + "    edit: " + metaField.getName());
@@ -93,7 +93,7 @@ public class MetaModel {
     }
 
     public MetaField getMetaField(String key) {
-        return _fieldsByName.get(key);
+        return _fieldsByName.get(key.toLowerCase());
     }
 
     public Collection<MetaField> getMetaFields() {
@@ -159,11 +159,11 @@ public class MetaModel {
     }
 
     public String getEditableFieldTitle(MetaField metaField) {
-        return getFieldTitle(_fieldsByName.get(metaField.getName()));
+        return getFieldTitle(getMetaField(metaField.getName()));
     }
 
     public Object getEditableFieldValue(MetaField metaField, Object object) {
-        MetaField field = _fieldsByName.get(metaField.getName());
+        MetaField field = getMetaField(metaField.getName());
         return field.getValue(object);
     }
 

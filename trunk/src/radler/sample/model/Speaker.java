@@ -1,10 +1,13 @@
-package radler.sample;
+package radler.sample.model;
 
 import radler.gui.annotation.Editables;
 import radler.gui.annotation.Selectables;
 import radler.persistence.annotation.Id;
 import radler.persistence.annotation.ManyToMany;
 import radler.persistence.annotation.OneToMany;
+import radler.sample.model.Meeting;
+import radler.sample.model.Role;
+import radler.sample.model.Sex;
 
 import java.util.List;
 
