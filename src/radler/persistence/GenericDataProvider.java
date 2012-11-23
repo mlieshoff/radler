@@ -2,8 +2,8 @@ package radler.persistence;
 
 import radler.gui.MetaField;
 import radler.gui.MetaModel;
-import radler.sample.Role;
-import radler.sample.Sex;
+import radler.sample.model.Role;
+import radler.sample.model.Sex;
 
 import java.util.ArrayList;
 import java.util.HashMap;

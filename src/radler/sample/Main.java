@@ -1,6 +1,10 @@
 package radler.sample;
 
 import radler.Application;
+import radler.sample.model.Meeting;
+import radler.sample.model.Role;
+import radler.sample.model.Sex;
+import radler.sample.model.Speaker;
 
 /**
  * This ...

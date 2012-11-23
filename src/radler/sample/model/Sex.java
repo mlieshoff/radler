@@ -1,4 +1,4 @@
-package radler.sample;
+package radler.sample.model;
 
 import radler.gui.annotation.Editables;
 import radler.gui.annotation.Selectables;
@@ -12,8 +12,8 @@ import radler.persistence.annotation.Id;
 @Selectables(columns = {"title"})
 @Editables(columns = {"title"})
 public class Sex {
-
     @Id
+    private int id;
     private String title;
 
     public String getTitle() {
